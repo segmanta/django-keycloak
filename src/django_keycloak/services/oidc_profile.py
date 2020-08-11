@@ -103,9 +103,9 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
         UserModel = get_user_model()
         email_field_name = UserModel.get_email_field_name()
         user, _ = UserModel.objects.update_or_create(
-            username=id_token_object['sub'],
+            email=id_token_object.get('email', ''),
             defaults={
-                email_field_name: id_token_object.get('email', ''),
+                'username': id_token_object['sub'],
                 'first_name': id_token_object.get('given_name', ''),
                 'last_name': id_token_object.get('family_name', '')
             }
