@@ -75,7 +75,7 @@ def get_or_create_from_id_token(client, id_token):
         client=client, id_token_object=id_token_object)
 
 
-def update_or_create_user_and_oidc_profile(client, id_token_object):
+def update_or_create_user_and_oidc_profile(client, id_token_object, force_remote = False):
     """
 
     :param client:
@@ -85,7 +85,7 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
 
     OpenIdConnectProfileModel = get_openid_connect_profile_model()
 
-    if OpenIdConnectProfileModel.is_remote:
+    if OpenIdConnectProfileModel.is_remote or force_remote:
         oidc_profile, _ = OpenIdConnectProfileModel.objects.\
             update_or_create(
                 sub=id_token_object['sub'],
@@ -192,7 +192,7 @@ def update_or_create_from_password_credentials(username, password, client):
                              initiate_time=initiate_time)
 
 
-def _update_or_create(client, token_response, initiate_time):
+def _update_or_create(client, token_response, initiate_time, force_remote = False):
     """
     Update or create an user based on a token response.
 
@@ -224,7 +224,8 @@ def _update_or_create(client, token_response, initiate_time):
 
     oidc_profile = update_or_create_user_and_oidc_profile(
         client=client,
-        id_token_object=token_object)
+        id_token_object=token_object,
+        force_remote=force_remote)
 
     return update_tokens(token_model=oidc_profile,
                          token_response=token_response,

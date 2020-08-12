@@ -86,7 +86,8 @@ def get_service_account_profile(client):
     oidc_profile = django_keycloak.services.oidc_profile._update_or_create(
         client=client,
         token_response=token_response,
-        initiate_time=initiate_time)
+        initiate_time=initiate_time,
+        force_remote=True)
 
     client.service_account_profile = oidc_profile
     client.save(update_fields=['service_account_profile'])
