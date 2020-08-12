@@ -21,7 +21,8 @@ def add_user(client, user):
     :param django_keycloak.models.Client client:
     :param django.contrib.auth.models.User user:
     """
-    credentials = credential_representation_from_hash(hash_=user.password)
+    credentials = []
+    credentials.append(credential_representation_from_hash(hash_=user.password))
 
     client.admin_api_client.realms.by_name(client.realm.name).users.create(
         username=user.username,

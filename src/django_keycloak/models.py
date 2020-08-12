@@ -224,7 +224,7 @@ class OpenIdConnectProfile(OpenIdConnectProfileAbstract):
                                 related_name='oidc_profile',
                                 on_delete=models.CASCADE)
 
-    class Meta(RemoteUserOpenIdConnectProfile.Meta):
+    class Meta(OpenIdConnectProfileAbstract.Meta):
         swappable = 'KEYCLOAK_OIDC_PROFILE_MODEL'
 
 
