@@ -11,7 +11,6 @@ from django.utils import timezone
 from django.utils.module_loading import import_string
 from keycloak.exceptions import KeycloakClientError
 
-from django_keycloak.models import RemoteUserOpenIdConnectProfile
 from django_keycloak.services.exceptions import TokensExpired
 from django_keycloak.remote_user import KeycloakRemoteUser
 
@@ -76,7 +75,7 @@ def get_or_create_from_id_token(client, id_token):
         client=client, id_token_object=id_token_object)
 
 
-def update_or_create_user_and_oidc_profile(client, id_token_object, force_remote = False):
+def update_or_create_user_and_oidc_profile(client, id_token_object):
     """
 
     :param client:
@@ -84,7 +83,7 @@ def update_or_create_user_and_oidc_profile(client, id_token_object, force_remote
     :return:
     """
 
-    OpenIdConnectProfileModel = RemoteUserOpenIdConnectProfile if force_remote else get_openid_connect_profile_model()
+    OpenIdConnectProfileModel = get_openid_connect_profile_model()
 
     if OpenIdConnectProfileModel.is_remote:
         oidc_profile, _ = OpenIdConnectProfileModel.objects.\
@@ -193,7 +192,7 @@ def update_or_create_from_password_credentials(username, password, client):
                              initiate_time=initiate_time)
 
 
-def _update_or_create(client, token_response, initiate_time, force_remote = False):
+def _update_or_create(client, token_response, initiate_time, service_account = False):
     """
     Update or create an user based on a token response.
 
@@ -223,10 +222,12 @@ def _update_or_create(client, token_response, initiate_time, force_remote = Fals
         issuer=issuer
     )
 
+    if service_account:
+        token_object['email'] = '{}@segmanta.com'.format(token_object['sub'])
+
     oidc_profile = update_or_create_user_and_oidc_profile(
         client=client,
-        id_token_object=token_object,
-        force_remote=force_remote)
+        id_token_object=token_object)
 
     return update_tokens(token_model=oidc_profile,
                          token_response=token_response,

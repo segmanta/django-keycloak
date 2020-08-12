@@ -87,7 +87,7 @@ def get_service_account_profile(client):
         client=client,
         token_response=token_response,
         initiate_time=initiate_time,
-        force_remote=True)
+        service_account=True)
 
     client.service_account_profile = oidc_profile
     client.save(update_fields=['service_account_profile'])
