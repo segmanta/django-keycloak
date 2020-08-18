@@ -14,7 +14,7 @@ def credential_representation_from_hash(hash_, temporary=False):
     }
 
 
-def add_user(client, user):
+def add_user(client, user, id=None):
     """
     Create user in Keycloak based on a local user including password.
 
@@ -30,5 +30,6 @@ def add_user(client, user):
         first_name=user.first_name,
         last_name=user.last_name,
         email=user.email,
-        enabled=user.is_active
+        enabled=user.is_active,
+        id=id
     )
