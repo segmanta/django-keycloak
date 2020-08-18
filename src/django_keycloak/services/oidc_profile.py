@@ -106,6 +106,7 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
             email=id_token_object.get('email', ''),
             defaults={
                 'username': id_token_object['sub'],
+                'keycloak_id': id_token_object['sub'], # need to generalize it so the forked repo will stand by it's own
                 'first_name': id_token_object.get('given_name', ''),
                 'last_name': id_token_object.get('family_name', '')
             }
