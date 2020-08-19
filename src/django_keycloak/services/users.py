@@ -14,22 +14,22 @@ def credential_representation_from_hash(hash_, temporary=False):
     }
 
 
-def add_user(client, user, id=None):
+def add_user(client, user):
     """
     Create user in Keycloak based on a local user including password.
 
     :param django_keycloak.models.Client client:
     :param django.contrib.auth.models.User user:
+    :rtype response
     """
     credentials = []
     credentials.append(credential_representation_from_hash(hash_=user.password))
 
-    client.admin_api_client.realms.by_name(client.realm.name).users.create(
+    return client.admin_api_client.realms.by_name(client.realm.name).users.create(
         username=user.username,
         credentials=credentials,
         first_name=user.first_name,
         last_name=user.last_name,
         email=user.email,
-        enabled=user.is_active,
-        id=id
+        enabled=user.is_active
     )
