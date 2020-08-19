@@ -28,10 +28,10 @@ setup(
     },
     setup_requires=[
         'pytest-runner',
-        'python-keycloak-client',
+        'python-keycloak-client@git+https://github.com/segmanta/python-keycloak-client@master',
     ],
     install_requires=[
-        'python-keycloak-client>=0.2.2',
+        'python-keycloak-client@git+https://github.com/segmanta/python-keycloak-client@master',
         'Django>=1.11',
     ],
     tests_require=[
