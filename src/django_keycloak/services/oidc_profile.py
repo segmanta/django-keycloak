@@ -215,12 +215,16 @@ def _update_or_create(client, token_response, initiate_time, service_account = F
     token_response_key = 'id_token' if 'id_token' in token_response \
         else 'access_token'
 
+    # if code flow the id_token is accompanied with access_token and it has to be validated using at_hash parameter
+    access_token = token_response['access_token'] if token_response_key == 'id_token' else None
+
     token_object = client.openid_api_client.decode_token(
         token=token_response[token_response_key],
         key=client.realm.certs,
         algorithms=client.openid_api_client.well_known[
             'id_token_signing_alg_values_supported'],
-        issuer=issuer
+        issuer=issuer,
+        access_token=access_token
     )
 
     if service_account:
