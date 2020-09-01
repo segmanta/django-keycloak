@@ -154,15 +154,15 @@ class KeycloakIDTokenAuthorizationBackend(KeycloakAuthorizationBase):
                 )
         except ExpiredSignatureError:
             # If the signature has expired.
-            logger.debug('KeycloakBearerAuthorizationBackend: failed to '
+            logger.info('KeycloakBearerAuthorizationBackend: failed to '
                          'authenticate due to an expired access token.')
         except JWTClaimsError as e:
-            logger.debug('KeycloakBearerAuthorizationBackend: failed to '
+            logger.info('KeycloakBearerAuthorizationBackend: failed to '
                          'authenticate due to failing claim checks: "%s"'
                          % str(e))
         except JWTError:
             # The signature is invalid in any way.
-            logger.debug('KeycloakBearerAuthorizationBackend: failed to '
+            logger.info('KeycloakBearerAuthorizationBackend: failed to '
                          'authenticate due to a malformed access token.')
         else:
             return oidc_profile.user
