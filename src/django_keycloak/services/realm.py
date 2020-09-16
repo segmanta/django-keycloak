@@ -17,7 +17,7 @@ def get_realm_api_client(realm):
         # An internal URL is configured. We add some additional settings to let
         # Keycloak think that we access it using the server_url.
         server_url = realm.server.internal_url
-        parsed_url = urlparse(realm.server.url)
+        parsed_url = urlparse(realm.server.internal_url)
         headers['Host'] = parsed_url.netloc
 
         if parsed_url.scheme == 'https':
