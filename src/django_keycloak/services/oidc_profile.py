@@ -228,7 +228,7 @@ def _update_or_create(client, token_response, initiate_time, service_account = F
     )
 
     if service_account:
-        token_object['email'] = '{}@segmanta.com'.format(token_object['sub'])
+        token_object['email'] = 'service-account-{}@segmanta.com'.format(token_object['sub'])
 
     oidc_profile = update_or_create_user_and_oidc_profile(
         client=client,
