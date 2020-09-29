@@ -23,7 +23,10 @@ def add_user(client, user):
     :rtype response
     """
     credentials = []
-    credentials.append(credential_representation_from_hash(hash_=user.password))
+
+    if user.password != "":
+        new_credential = credential_representation_from_hash(hash_=user.password)
+        credentials.append(new_credential)
 
     return client.admin_api_client.realms.by_name(client.realm.name).users.create(
         username=user.username,
