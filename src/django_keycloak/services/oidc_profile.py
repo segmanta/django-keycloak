@@ -16,6 +16,7 @@ from django_keycloak.remote_user import KeycloakRemoteUser
 
 
 import django_keycloak.services.realm
+from django_keycloak.services.users import get_email_model
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +108,7 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
         # keycloak_id is unique so there is only 0 or 1
         if len(users) == 1:
             user = users[0]
-            user.email = id_token_object.get('email', '')
+            update_user_email(user, id_token_object.get('email', ''))
             user.username = id_token_object['sub']
             user.keycloak_id = id_token_object['sub']
             user.first_name = id_token_object.get('given_name', '')
@@ -129,6 +130,22 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
         )
 
     return oidc_profile
+
+
+def update_user_email(user, email):
+    email_model = get_email_model()
+
+    if email_model == None:
+        user.email = email
+        user.save()
+        return user
+
+    with transaction.atomic():
+        email_model.objects.filter(user=user).update(email=email)
+        user.email = email
+        user.save()
+
+    return user
 
 
 def get_remote_user_from_profile(oidc_profile):
