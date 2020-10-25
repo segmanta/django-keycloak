@@ -1,6 +1,6 @@
 import base64
 
-from django_keycloak.tests import settings
+from django.conf import settings
 from django.utils.module_loading import import_string
 from django.core.exceptions import ImproperlyConfigured
 
