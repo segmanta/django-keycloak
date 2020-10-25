@@ -100,17 +100,25 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
         return oidc_profile
 
     with transaction.atomic():
+        user = None
         UserModel = get_user_model()
-        email_field_name = UserModel.get_email_field_name()
-        user, _ = UserModel.objects.update_or_create(
-            email=id_token_object.get('email', ''),
-            defaults={
-                'username': id_token_object['sub'],
-                'keycloak_id': id_token_object['sub'], # need to generalize it so the forked repo will stand by it's own
-                'first_name': id_token_object.get('given_name', ''),
-                'last_name': id_token_object.get('family_name', '')
-            }
-        )
+        users = UserModel.objects.filter(keycloak_id=id_token_object['sub'])
+
+        # keycloak_id is unique so there is only 0 or 1
+        if len(users) == 1:
+            user = users[0]
+            user.email = id_token_object.get('email', '')
+            user.username = id_token_object['sub']
+            user.keycloak_id = id_token_object['sub']
+            user.first_name = id_token_object.get('given_name', '')
+            user.last_name = id_token_object.get('family_name', '')
+            user.save()
+        else:
+            user = UserModel.objects.create(email=id_token_object.get('email', ''),
+                                            keycloak_id=id_token_object['sub'],
+                                            username=id_token_object['sub'],
+                                            first_name=id_token_object.get('given_name', ''),
+                                            last_name = id_token_object.get('family_name', ''))
 
         oidc_profile, _ = OpenIdConnectProfileModel.objects.update_or_create(
             sub=id_token_object['sub'],
