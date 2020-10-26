@@ -16,6 +16,7 @@ from django_keycloak.remote_user import KeycloakRemoteUser
 
 
 import django_keycloak.services.realm
+from django_keycloak.services.users import get_email_model
 
 logger = logging.getLogger(__name__)
 
@@ -100,17 +101,26 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
         return oidc_profile
 
     with transaction.atomic():
+        user = None
         UserModel = get_user_model()
-        email_field_name = UserModel.get_email_field_name()
-        user, _ = UserModel.objects.update_or_create(
-            email=id_token_object.get('email', ''),
-            defaults={
-                'username': id_token_object['sub'],
-                'keycloak_id': id_token_object['sub'], # need to generalize it so the forked repo will stand by it's own
-                'first_name': id_token_object.get('given_name', ''),
-                'last_name': id_token_object.get('family_name', '')
-            }
-        )
+        users = UserModel.objects.filter(keycloak_id=id_token_object['sub'])
+
+        # keycloak_id is unique so there is only 0 or 1
+        if len(users) == 1:
+            user = users[0]
+            update_user_email(user, id_token_object.get('email', ''))
+            user.username = id_token_object['sub']
+            user.keycloak_id = id_token_object['sub']
+            user.first_name = id_token_object.get('given_name', '')
+            user.last_name = id_token_object.get('family_name', '')
+            user.save()
+        else:
+            assert len(users) == 0, 'len(users) is neither 0 nor 1, this should never happen'
+            user = UserModel.objects.create(email=id_token_object.get('email', ''),
+                                            keycloak_id=id_token_object['sub'],
+                                            username=id_token_object['sub'],
+                                            first_name=id_token_object.get('given_name', ''),
+                                            last_name = id_token_object.get('family_name', ''))
 
         oidc_profile, _ = OpenIdConnectProfileModel.objects.update_or_create(
             sub=id_token_object['sub'],
@@ -121,6 +131,22 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
         )
 
     return oidc_profile
+
+
+def update_user_email(user, email):
+    email_model = get_email_model()
+
+    if email_model == None:
+        user.email = email
+        user.save()
+        return user
+
+    with transaction.atomic():
+        email_model.objects.filter(user=user).update(email=email)
+        user.email = email
+        user.save()
+
+    return user
 
 
 def get_remote_user_from_profile(oidc_profile):
