@@ -115,6 +115,7 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
             user.last_name = id_token_object.get('family_name', '')
             user.save()
         else:
+            assert len(users) == 0, 'len(users) is neither 0 nor 1, this should never happen'
             user = UserModel.objects.create(email=id_token_object.get('email', ''),
                                             keycloak_id=id_token_object['sub'],
                                             username=id_token_object['sub'],
