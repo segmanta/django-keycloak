@@ -134,16 +134,17 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
 
 
 def update_user_email(user, email):
+    lower_case_email = email.lower()
     email_model = get_email_model()
 
     if email_model == None:
-        user.email = email
+        user.email = lower_case_email
         user.save()
         return user
 
     with transaction.atomic():
-        email_model.objects.filter(user=user).update(email=email)
-        user.email = email
+        email_model.objects.filter(user=user).update(email=lower_case_email)
+        user.email = lower_case_email
         user.save()
 
     return user
