@@ -104,6 +104,8 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
         user = None
         UserModel = get_user_model()
         users = UserModel.objects.filter(keycloak_id=id_token_object['sub'])
+        if len(users) == 0:
+            users = UserModel.objects.filter(email=id_token_object['email'], keycloak_id__isnull=True)
 
         # keycloak_id is unique so there is only 0 or 1
         if len(users) == 1:
