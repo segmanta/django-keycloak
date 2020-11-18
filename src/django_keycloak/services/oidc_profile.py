@@ -111,7 +111,6 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
         if len(users) == 1:
             user = users[0]
             update_user_email(user, id_token_object.get('email', ''))
-            user.username = id_token_object['sub']
             user.keycloak_id = id_token_object['sub']
             user.first_name = id_token_object.get('given_name', '')
             user.last_name = id_token_object.get('family_name', '')
@@ -120,7 +119,6 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
             assert len(users) == 0, 'len(users) is neither 0 nor 1, this should never happen'
             user = UserModel.objects.create(email=id_token_object.get('email', ''),
                                             keycloak_id=id_token_object['sub'],
-                                            username=id_token_object['sub'],
                                             first_name=id_token_object.get('given_name', ''),
                                             last_name = id_token_object.get('family_name', ''))
 
