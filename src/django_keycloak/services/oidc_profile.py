@@ -16,7 +16,6 @@ from django_keycloak.remote_user import KeycloakRemoteUser
 
 
 import django_keycloak.services.realm
-from django_keycloak.services.users import get_email_model
 
 logger = logging.getLogger(__name__)
 
