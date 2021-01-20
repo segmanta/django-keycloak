@@ -40,18 +40,3 @@ def add_user(client, user):
         email=user.email,
         enabled=user.is_active
     )
-
-def get_email_model():
-    """
-    Return the Email model that is active in this project.
-    """
-    if not hasattr(settings, 'EXTERNAL_EMAIL_MODEL'):
-        # By default return None
-        return None
-
-    try:
-        return import_string(settings.EXTERNAL_EMAIL_MODEL)
-    except ImportError:
-        raise ImproperlyConfigured(
-            "EXTERNAL_EMAIL_MODEL refers to non-existing class"
-        )

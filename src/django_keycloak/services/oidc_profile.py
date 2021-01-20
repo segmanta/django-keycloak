@@ -104,8 +104,6 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
         user = None
         UserModel = get_user_model()
         users = UserModel.objects.filter(keycloak_id=id_token_object['sub'])
-        if len(users) == 0:
-            users = UserModel.objects.filter(email=id_token_object['email'], keycloak_id__isnull=True)
 
         # keycloak_id is unique so there is only 0 or 1
         if len(users) == 1:
@@ -135,17 +133,10 @@ def update_or_create_user_and_oidc_profile(client, id_token_object):
 
 def update_user_email(user, email):
     lower_case_email = email.lower()
-    email_model = get_email_model()
 
-    if email_model == None:
-        user.email = lower_case_email
-        user.save()
-        return user
-
-    with transaction.atomic():
-        email_model.objects.filter(user=user).update(email=lower_case_email)
-        user.email = lower_case_email
-        user.save()
+    user.email = lower_case_email
+    user.save()
+    return user
 
     return user
 
